@@ -21,13 +21,13 @@ docker run -it --rm -p 6080:80 dorowu/ubuntu-desktop-lxde-vnc
 #### Connect with VNC Viewer and Protect with a Custom VNC Password;
 
 ```
-docker run -it --rm -p 6080:80 -p 5900:5900 dorowu/ubuntu-desktop-lxde-vnc
+docker run -it --rm -p 6080:80 -p 5900:5900 mkurtis/profbox:v5
 ```
 
 *Now connect by pointing your VNC viewer to localhost port 5900.*
 
 ```
-docker run -it --rm -p 6080:80 -p 5900:5900 -e VNC_PASSWORD=mypassword dorowu/ubuntu-desktop-lxde-vnc
+docker run -it --rm -p 6080:80 -p 5900:5900 -e VNC_PASSWORD=mypassword mkurtis/profbox:v5
 ```
 
 *A prompt will ask password either in the browser or vnc viewer.*
