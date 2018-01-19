@@ -11,7 +11,7 @@ Profbox is a container based set of utilities aimed at performing JMX profiling 
 #### Run the docker image listening on port 6080;
 
 ```
-docker run -it --rm -p 6080:80 dorowu/ubuntu-desktop-lxde-vnc
+docker run -it --rm -p 6080:80 mkurtis/profbox:v5
 ```
 
 *Now point your browser to: http://localhost:6080/*
