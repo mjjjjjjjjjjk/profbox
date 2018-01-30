@@ -1,20 +1,8 @@
 FROM ubuntu:16.04
-
+# props to Doro Wu <fcwu.tw@gmail.com>, from which this depends on heavily.
 MAINTAINER Mike Kurtis <MKurtis@Mesosphere.com>
-# kudos and props go to the following projects, from which this borrows heavily;
-#    https://hub.docker.com/r/psharkey/novnc
-#    https://hub.docker.com/r/dorowu/ubuntu-desktop-lxde-vnc
 
-# Setup demo environment variables
-ENV HOME=/root \
-        DEBIAN_FRONTEND=noninteractive \
-        LANG=en_US.UTF-8 \
-        LANGUAGE=en_US.UTF-8 \
-        LC_ALL=C.UTF-8 \
-        DISPLAY=:0.0 \
-        DISPLAY_WIDTH=1024 \
-        DISPLAY_HEIGHT=768
-
+ENV DEBIAN_FRONTEND noninteractive
 
 RUN sed -i 's#http://archive.ubuntu.com/#http://tw.archive.ubuntu.com/#' /etc/apt/sources.list
 
@@ -29,10 +17,7 @@ RUN apt-get update \
         supervisor \
         openssh-server pwgen sudo vim-tiny \
         net-tools \
-        socat \
-        bash \
-        fluxbox \
-        lxde x11vnc xvfb xterm \
+        lxde x11vnc xvfb \
         gtk2-engines-murrine ttf-ubuntu-font-family \
         libreoffice firefox \
         fonts-wqy-microhei \
@@ -42,31 +27,40 @@ RUN apt-get update \
         mesa-utils libgl1-mesa-dri \
         gnome-themes-standard gtk2-engines-pixbuf gtk2-engines-murrine pinta arc-theme \
         dbus-x11 x11-utils \
-        default-jdk \
-        jq \
-        unzip \
-        dnsutils \
-        git \
-        vim \
-        wget \
+	default-jdk \
+	jq \
+	unzip \
+	dnsutils \
+	git \
+	vim \
+	wget \
     && apt-get autoclean \
     && apt-get autoremove \
     && rm -rf /var/lib/apt/lists/*
 
-# Clone noVNC from github
-RUN git clone https://github.com/novnc/noVNC.git /root/noVNC \
-	&& git clone https://github.com/novnc/websockify.git /root/noVNC/utils/websockify \
-	&& rm -rf /root/noVNC/.git \
-	&& rm -rf /root/noVNC/utils/websockify/.git 
 
 
-COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-#COPY jconsole_start.sh /root
 
 
-# Modify the launch script 'ps -p'
-RUN sed -i -- "s/ps -p/ps -o pid | grep/g" /root/noVNC/utils/launch.sh
+WORKDIR /root
 
-EXPOSE 8080
 
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+# Make port 80 available to the world outside this container
+EXPOSE 22
+EXPOSE 80
+EXPOSE 5899-5904
+
+
+# tini for subreap                                   
+ENV TINI_VERSION v0.9.0
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /bin/tini
+RUN chmod +x /bin/tini
+
+ADD image /
+RUN pip install setuptools wheel && pip install -r /usr/lib/web/requirements.txt
+
+EXPOSE 80 6080
+WORKDIR /root
+ENV HOME=/home/ubuntu \
+    SHELL=/bin/bash
+ENTRYPOINT ["/startup.sh"]
