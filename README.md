@@ -14,5 +14,11 @@ Profbox is a container based set of utilities aimed at performing JMX profiling 
 docker run -it --rm -p 8080:8080 mkurtis/profbox:v5
 ```
 
+Better yet, pass a password in as an environment variable;
+```
+docker run -it --rm -p 8080:8080 -e PASSWORD=cyanide mkurtis/profbox:v3
+
+```
+
 *Now point your browser to: http://localhost:8080/*
 
